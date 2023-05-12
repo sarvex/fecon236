@@ -66,9 +66,9 @@ from fecon236.dst.gaussmix import gemrat
 
 def test_bootstrap_fecon236_Read_CSV_file():
     '''Read CSV file then check values.'''
-    df = fred.readfile('tests' + sep + 'zdata-xau-13hj-c30.csv')
+    df = fred.readfile(f'tests{sep}zdata-xau-13hj-c30.csv')
     #         readfile disregards XAU column name:
-    assert [col for col in df.columns] == ['Y']
+    assert list(df.columns) == ['Y']
     assert df.shape == (30, 1)
     return df
 
@@ -79,10 +79,10 @@ xau = test_bootstrap_fecon236_Read_CSV_file()
 
 def test_bootstrap_fecon236_writefile_normdiflog_read():
     '''Create normdiflog CSV file, then read it as dataframe for testing.'''
-    fname = 'tests' + sep + 'tmp-xau-normdiflog.csv'
+    fname = f'tests{sep}tmp-xau-normdiflog.csv'
     bs.writefile_normdiflog(xau, filename=fname)
-    df = bs.readcsv('tests' + sep + 'tmp-xau-normdiflog.csv')
-    assert [col for col in df.columns] == ['Y']
+    df = bs.readcsv(f'tests{sep}tmp-xau-normdiflog.csv')
+    assert list(df.columns) == ['Y']
     assert df.shape == (29, 1)
     assert round(tool.tailvalue(df[:'2013-04-15']), 3) == -4.804
     assert round(tool.tailvalue(df), 3) == 0.295
@@ -90,7 +90,7 @@ def test_bootstrap_fecon236_writefile_normdiflog_read():
 
 def test_bootstrap_fecon236_ROUNDTRIP():
     '''Do a roundtrip using all the functionality.'''
-    fname = 'tests' + sep + 'tmp-xau-normdiflog.csv'
+    fname = f'tests{sep}tmp-xau-normdiflog.csv'
     bs.writefile_normdiflog(xau, filename=fname)
     _, xaumean, xausigma, _, _, _ = gemrat(xau, yearly=256, pc=False)
     #  gemrat: "RuntimeWarning: invalid value encountered in log"

@@ -53,11 +53,10 @@ def stock_decode(slang):
         #  So if given argument is in all CAPS,
         #  or does not begin with 's4'
         raise ValueError('Stock slang argument is invalid.')
-    else:
-        try:
-            symbol = slang[2:].upper()
-        except Exception:
-            raise ValueError('Stock slang argument is invalid.')
+    try:
+        symbol = slang[2:].upper()
+    except Exception:
+        raise ValueError('Stock slang argument is invalid.')
     return symbol
 
 
@@ -82,10 +81,10 @@ def stock_all(slang, maxi=3650):
     #        MAIN: use Yahoo Finance before Google Finance:
     try:
         df = pddata.DataReader(symbol, 'yahoo',  start, end)
-        print(" ::  Retrieved from Yahoo Finance: " + symbol)
+        print(f" ::  Retrieved from Yahoo Finance: {symbol}")
     except Exception:
         df = pddata.DataReader(symbol, 'google', start, end)
-        print(" ::  Retrieved from Google Finance: " + symbol)
+        print(f" ::  Retrieved from Google Finance: {symbol}")
     return df
 
 
@@ -103,12 +102,7 @@ def getstock(slang, maxi=3650):
     maxi is the number of chronological, not trading, days.
     We can SYNTHESIZE a s4 slang by use of string equivalent arg.
     '''
-    if False:
-        pass
-    elif False:
-        pass
-    else:
-        df = stock_one(slang, maxi, 'Close')
+    df = stock_one(slang, maxi, 'Close')
     #
     #         _Give default fecon235 names to column and index:
     df = tool.names(df)

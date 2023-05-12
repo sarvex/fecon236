@@ -48,15 +48,7 @@ def softmax(it, temp=55, n=4):
     #      Important to note arrstable will consist of maximum(s) represented
     #      by zero, and all other values will be necessarily negative.
     if temp > 0:
-        avg = np.mean(arrstable)
-        if avg:
-            tau = abs(avg * (temp/100.0))
-            #  Let temperature be POSITIVE and temp percent of ensemble mean.
-        else:
-            #  Edge case: avg will be zero if it-scores are all equal,
-            #  which implies they are equi-probable, so any tau should do,
-            #  but tau must be NON-ZERO to avoid division error next.
-            tau = 1.0
+        tau = abs(avg * (temp/100.0)) if (avg := np.mean(arrstable)) else 1.0
     else:
         #  Whenever temp is set to 0, False, or None => GENERIC softmax.
         #  Also negative temp will be treated as generic softmax.
@@ -102,7 +94,7 @@ def softmax_sort(it, temp=55, n=4, drop=0.00, renorm=False):
     tups = [(p, i, float(arr[i]))
             for i, p in enumerate(softmax_approx) if p >= drop]
     if renorm:
-        subtotal = sum([p for p, i, v in tups])
+        subtotal = sum(p for p, i, v in tups)
         tups = [(round(p/subtotal, n), i, v) for p, i, v in tups]
     #  Want softmax_sort()[0] to yield the maximum candidate:
     return sorted(tups, key=itemgetter(2), reverse=True)

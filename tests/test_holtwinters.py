@@ -79,9 +79,9 @@ from fecon236.tsa import holtwinters as hw              # noqa
 
 def test_holtwinters_fecon236_Read_CSV_file():
     '''Read CSV file then check values.'''
-    df = fred.readfile('tests' + sep + 'zdata-xau-13hj-c30.csv')
+    df = fred.readfile(f'tests{sep}zdata-xau-13hj-c30.csv')
     #         readfile disregards XAU column name:
-    assert [col for col in df.columns] == ['Y']
+    assert list(df.columns) == ['Y']
     assert df.shape == (30, 1)
     return df
 

@@ -72,7 +72,7 @@ def test_tool_fecon236_Read_CSV_file():
     '''Read CSV file then check values.'''
     df = fred.readfile('tests' + sep + 'zdata-xau-13hj-c30.csv')
     #         readfile disregards XAU column name:
-    assert [col for col in df.columns] == ['Y']
+    assert list(df.columns) == ['Y']
     assert df.shape == (30, 1)
     return df
 
@@ -84,7 +84,7 @@ xau = tool.todf(xau, 'XAU')
 
 def test_tool_fecon236_check_xau_DataFrame():
     '''Check xau dataframe.'''
-    assert [col for col in xau.columns] == ['XAU']
+    assert list(xau.columns) == ['XAU']
     assert tool.tailvalue(xau) == 1393.75
 
 
@@ -93,7 +93,7 @@ foo = tool.todf(xau + 5000.00, 'FOO')
 
 def test_tool_fecon236_check_foo_DataFrame():
     '''Check foo dataframe which is just xau + 5000.00 increase.'''
-    assert [col for col in foo.columns] == ['FOO']
+    assert list(foo.columns) == ['FOO']
     assert tool.tailvalue(foo) == 6393.75
 
 
@@ -102,7 +102,7 @@ xaufoo = tool.paste([xau, foo])
 
 def test_tool_fecon236_paste_function():
     '''Test xau and foo pasted together as xaufoo dataframe.'''
-    assert [col for col in xaufoo.columns] == ['XAU', 'FOO']
+    assert list(xaufoo.columns) == ['XAU', 'FOO']
     assert xaufoo.shape == (30, 2)
     assert tool.tailvalue(xaufoo, pos=0) == 1393.75
     assert tool.tailvalue(xaufoo, pos=1) == 6393.75
@@ -117,8 +117,16 @@ xaufoolag = tool.lagdf(xaufoo, lags=3)
 
 def test_tool_fecon236_lagdf_function():
     '''Test xaufoolag dataframe created by lagdf on xaufoo with lags=3.'''
-    assert [col for col in xaufoolag.columns] == ['XAU_0', 'FOO_0',
-            'XAU_1', 'FOO_1', 'XAU_2', 'FOO_2', 'XAU_3', 'FOO_3']  # noqa
+    assert list(xaufoolag.columns) == [
+        'XAU_0',
+        'FOO_0',
+        'XAU_1',
+        'FOO_1',
+        'XAU_2',
+        'FOO_2',
+        'XAU_3',
+        'FOO_3',
+    ]
     #  Number after underscore indicates lag.
     assert xaufoolag.shape == (27, 8)
     #                lags will introduce NaN, which are then dropped,

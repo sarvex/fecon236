@@ -66,13 +66,13 @@ def saveImage(func):
         if not title.startswith('tmp'):
             title = title.replace(' ', '_')
             imgf = 'img' + '-' + func.__name__ + '-' + title + '.png'
-            print(" ::  Stand-by, saving, " + str(dotsperinch)
-                  + " DPI: " + imgf)
+            print((f" ::  Stand-by, saving, {str(dotsperinch)} DPI: " + imgf))
             fig.set_size_inches(11.5, 8.5)
             fig.savefig(imgf, dpi=dotsperinch)
             #  ^Will overwrite file with same name.
             plt.close()
         return
+
     return saveimage
 
 
@@ -204,7 +204,7 @@ def scatter(dataframe, title='tmp', col=[0, 1]):
     #             cmap=colormap.viridis  [perceptual uniform]
     #         but we leave cmap arg out since viridis will be the
     #         default soon: http://matplotlib.org/users/colormaps.html
-    colstr = '_' + str(col[0]) + '-' + str(col[1])
+    colstr = f'_{str(col[0])}-{str(col[1])}'
     title = title + colstr
     ax.set_title(title + colstr + ' / last ' + str(dataframe.index[-1]))
     #                                          ^index on last data point
@@ -223,9 +223,9 @@ def scats(dataframe, title='tmp'):
     #  e.g. ncol==5  implies npairs==10
     #       ncol==10 implies npairs==45
     #       ncol==20 implies npairs==190
-    print(" ::  Number of pair-wise plots: " + str(npairs))
+    print(f" ::  Number of pair-wise plots: {str(npairs)}")
     for pair in pairs:
-        print(" ::  Show column pair: " + str(pair))
+        print(f" ::  Show column pair: {str(pair)}")
         scatter(dataframe, title, pair)
         print("----------------------")
     return

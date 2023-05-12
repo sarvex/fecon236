@@ -53,12 +53,13 @@ CHANGE LOG  For latest version, see https://git.io/fecon236
 2018-04-23  First version.
 '''
 
+
 import os
 from setuptools import setup, find_packages
 
 
 PROJECT = 'fecon236'
-PROJECTURL = 'https://github.com/MathSci/' + PROJECT
+PROJECTURL = f'https://github.com/MathSci/{PROJECT}'
 
 
 #  What packages are required? For example:
@@ -130,13 +131,13 @@ setup(
     url=PROJECTURL,
     project_urls={
         'Source': PROJECTURL,
-        'Require': PROJECTURL+'/blob/develop/require.txt',
-        'Installation': PROJECTURL+'/blob/develop/docs/READ/fe-10_Install.md',
-        'Documentation': PROJECTURL+'/tree/develop/docs',
+        'Require': f'{PROJECTURL}/blob/develop/require.txt',
+        'Installation': f'{PROJECTURL}/blob/develop/docs/READ/fe-10_Install.md',
+        'Documentation': f'{PROJECTURL}/tree/develop/docs',
         'Notebooks': 'https://github.com/rsvp/fecon235/tree/master/nb',
-        'Tracker': PROJECTURL+'/projects/3',
-        'Issues': PROJECTURL+'/issues',
-        'License': PROJECTURL+'/blob/master/LICENSE.md',
+        'Tracker': f'{PROJECTURL}/projects/3',
+        'Issues': f'{PROJECTURL}/issues',
+        'License': f'{PROJECTURL}/blob/master/LICENSE.md',
     },
     install_requires=REQUIRED,
     include_package_data=True,
@@ -156,7 +157,7 @@ setup(
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: Implementation :: CPython'
+        'Programming Language :: Python :: Implementation :: CPython',
     ],
 )
 

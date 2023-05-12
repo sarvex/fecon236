@@ -51,19 +51,13 @@ def get(code, maxi=0):
         #  Let failure report its real cause, e.g. RemoteDataError,
         #  when disruption of equities data occurs;
         #  see https://github.com/rsvp/fecon235/issues/7
-        if maxi:
-            df = getstock(code, maxi)
-        else:
-            df = getstock(code)
+        df = getstock(code, maxi) if maxi else getstock(code)
     else:
         try:
             df = getfred(code)
         except Exception:
             try:
-                if maxi:
-                    df = getqdl(code, maxi)
-                else:
-                    df = getqdl(code)
+                df = getqdl(code, maxi) if maxi else getqdl(code)
             except Exception:
                 raise ValueError('INVALID symbol string or code variable.')
     return df

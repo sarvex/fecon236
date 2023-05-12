@@ -265,9 +265,7 @@ def index_delta_secs(dataframe):
     secs = secs_timedelta64.astype(np.float32)
     if secs == 0.0:
         system.warn('Index contains duplicate, min delta was 0.')
-        return secs
-    else:
-        return secs
+    return secs
 
     #  There are OTHER METHODS to get the FREQUENCY of a dataframe:
     #       e.g.  df.index.freq  OR  df.index.freqstr ,
@@ -310,20 +308,14 @@ def index_delta_secs(dataframe):
 
 def resample_main(dataframe, rule, secs):
     '''Generalized resample routine for downsampling or upsampling.'''
-    #  rule is the offset string or object representing target conversion,
-    #       e.g. 'B', 'MS', or 'QS-OCT' to be compatible with FRED.
-    #  secs should be the maximum seconds expected for rule frequency.
     if index_delta_secs(dataframe) < secs:
-        df = dataframe.resample(rule, closed='left', label='left').median()
-        #    how='median' for DOWNSAMPLING deprecated as of pandas 0.18
-        return df
-    else:
-        df = dataframe.resample(rule, closed='left', label='left').fillna(None)
-        #    fill_method=None for UPSAMPLING deprecated as of pandas 0.18
-        #    note that None almost acts like np.nan which fails as argument.
-        #    interpolate() applies to those filled nulls when upsampling:
-        #    'linear' ignores index values treating it as equally spaced.
-        return df.interpolate(method='linear')
+        return dataframe.resample(rule, closed='left', label='left').median()
+    df = dataframe.resample(rule, closed='left', label='left').fillna(None)
+    #    fill_method=None for UPSAMPLING deprecated as of pandas 0.18
+    #    note that None almost acts like np.nan which fails as argument.
+    #    interpolate() applies to those filled nulls when upsampling:
+    #    'linear' ignores index values treating it as equally spaced.
+    return df.interpolate(method='linear')
 
 
 def daily(dataframe):
@@ -446,8 +438,7 @@ def getm4infleu():
     cpiall = getdata_fred('CP0000EZ17M086NEST')
     #                        ^for 17 countries.
     holtall = hw.holtlevel(cpiall)
-    normall = holtall / float(tool.tailvalue(holtall))
-    return normall
+    return holtall / float(tool.tailvalue(holtall))
     #  #   SUSPENDED since last is 2013-12-01.
     #  cpicore = getdata_fred('CPHPLA01EZM661N')
     #  holtcore = hw.holtlevel(cpicore)

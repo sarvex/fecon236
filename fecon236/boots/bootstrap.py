@@ -94,11 +94,11 @@ def writefile_normdiflog(df, filename='tmp-fe-normdiflog.csv', lags=1):
 def readcsv(datafile='tmp-fe-normdiflog.csv'):
     '''Read CSV file.'''
     try:
-        if datafile.endswith('.gz'):
-            df = readfile(datafile, compress='gzip')
-        else:
-            df = readfile(datafile)
-        return df
+        return (
+            readfile(datafile, compress='gzip')
+            if datafile.endswith('.gz')
+            else readfile(datafile)
+        )
     except Exception:
         raise ValueError("Improper or non-existent datafile specified.")
 
@@ -107,13 +107,7 @@ def csv2ret(datafile, mean=SPXmean, sigma=SPXsigma, yearly=256):
     '''Reform empirical N(0, 1) rates distribution as returns array.'''
     df = readcsv(datafile)    # Dataframe of normalized RATES of return.
     normarr = df['Y'].values  # That dataframe expressed as array.
-    #                .values converts to numpy ARRAY form.
-    #      The pandas index will no longer matter.
-    #      Next, form an array to efficiently bootstrap later.
-    poparr = sim.norat2ret(normarr, mean, sigma, yearly)
-    #  TIP: For repetitive simulations, poparr should be PRE-COMPUTED.
-    #     "POPULATION" array in RETURNS form (no longer rates):
-    return poparr
+    return sim.norat2ret(normarr, mean, sigma, yearly)
 
 
 def hybrid2ret(poparr, mean=SPXmean, sigma=SPXsigma, yearly=256):
@@ -124,32 +118,20 @@ def hybrid2ret(poparr, mean=SPXmean, sigma=SPXsigma, yearly=256):
     '''
     poplen = poparr.shape[0]
     gmarr = sim.gmix2ret(poplen, mean, sigma, yearly)
-    #  gmarr has same length as poparr to maximize the uncertainty
-    #  in distinguishing between population sample and GM(2) origins.
-    poparr2 = np.concatenate([poparr, gmarr])
-    #  We have DOUBLED the population size.
-    #      poparr2 can be used WHEREVER poparr is accepted.  <=!
-    #      poparr2 is intended to be PRE-COMPUTED for further processing.
-    return poparr2
+    return np.concatenate([poparr, gmarr])
 
 
 def bootstrap(N, poparr, replace=True):
     '''Randomly pick out N items from poparr.
        Default argument, replace=True, means "WITH replacement."
     '''
-    #  Note that replace=False is useful during testing to replicate
-    #  the entire population if necessary (e.g. to check terminal price).
-    #  The theory on bootstrap generally assumes replace=True.
-    bsarr = np.random.choice(poparr, size=N, replace=replace)
-    #      BOOTSTRAPPED array
-    return bsarr
+    return np.random.choice(poparr, size=N, replace=replace)
 
 
 def bsret2prices(N, poparr, inprice=1.0, replace=True):
     '''Transform array of bootstrap returns into DataFrame of prices.'''
     bsarr = bootstrap(N, poparr, replace=replace)
-    bsprices = sim.ret2prices(bsarr, inprice=inprice)
-    return bsprices
+    return sim.ret2prices(bsarr, inprice=inprice)
 
 
 def bootshow(N, poparr, yearly=256, repeat=1, visual=True, b=SPXb,
@@ -161,12 +143,12 @@ def bootshow(N, poparr, yearly=256, repeat=1, visual=True, b=SPXb,
         istr = str(i)
         prices = bsret2prices(N, poparr, inprice=inprice, replace=replace)
         if visual:
-            plotn(prices, title='tmp-bootshow-'+istr)
+            plotn(prices, title=f'tmp-bootshow-{istr}')
         try:
             gm2gem(prices, yearly=yearly, b=b)
         except OverflowError:
             system.warn("Excessive kurtosis: Skipping gm2gem() print.")
-        print('---------------------------------------' + istr)
+        print(f'---------------------------------------{istr}')
     return
 
 

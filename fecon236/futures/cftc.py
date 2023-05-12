@@ -42,10 +42,7 @@ def groupcotr(group=cotr4w, alpha=0):
     norpositions = groupfun(tool.normalize, positions)
     #  Default alpha argument will skip SMOOTHING operation...
     #  in any case, this function returns a pandas DataFrame:
-    if alpha:
-        return groupfun(hw.ema, norpositions, alpha)
-    else:
-        return norpositions
+    return groupfun(hw.ema, norpositions, alpha) if alpha else norpositions
 
 
 if __name__ == "__main__":

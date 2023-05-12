@@ -73,7 +73,7 @@ def warn(message, stub="WARNING:", prefix=" !. "):
 
 def die(message, errcode=1, prefix=" !! "):
     '''Gracefully KILL script, optionally specifying error code.'''
-    stub = "FATAL " + str(errcode) + ":"
+    stub = f"FATAL {str(errcode)}:"
     warn(message, stub, prefix)
     sys.exit(errcode)
     #         ^interpretation is system dependent;
@@ -88,10 +88,7 @@ def date(hour=True, utc=True, localstr=' Local'):
        Setting utc to False will give local time instead of UTC,
        then localstr can be used to indicate location.
     '''
-    if hour:
-        form = "%Y-%m-%d, %H:%M:%S"
-    else:
-        form = "%Y-%m-%d"
+    form = "%Y-%m-%d, %H:%M:%S" if hour else "%Y-%m-%d"
     if utc:
         form += ' UTC'
         tup = time.gmtime()
@@ -118,17 +115,16 @@ def pythontup():
 def versionstr(module="IPython"):
     '''Represent version as a string, or None if not installed.'''
     #  Unfortunately must treat Python vs its modules differently...
-    if module == "Python" or module == "python":
+    if module in ["Python", "python"]:
         ver = pythontup()
-        return str(ver[0]) + '.' + str(ver[1]) + '.' + str(ver[2])
+        return f'{str(ver[0])}.{str(ver[1])}.{str(ver[2])}'
     else:
         try:
             #  2019-01-11 Fix: python3 dislikes import using exec().
             #  exec("import " + module)
             #  exec("vermod = " + module + ".__version__")
             mod = __import__(module)
-            vermod = mod.__version__
-            return vermod
+            return mod.__version__
         except Exception:
             return None
 
@@ -141,10 +137,7 @@ def versiontup(module="IPython"):
         return tuple(v)
     except Exception:
         #  e.g. if not installed or not convertible to integers...
-        if s is None:
-            return (0,  0,  0)
-        else:
-            return (-9, -9, -9)
+        return (0, 0, 0) if s is None else (-9, -9, -9)
 
 
 def version(module="IPython"):
@@ -235,12 +228,7 @@ def endmodule():
    e.g.    answer = get_input("Favorite animal? ")
            print(answer)
 '''
-if pythontup() < (3, 0, 0):
-    get_input = raw_input   # noqa
-else:
-    #   But beware of untrustworthy arguments!
-    get_input = input
 
-
+get_input = raw_input if pythontup() < (3, 0, 0) else input
 if __name__ == "__main__":
     endmodule()

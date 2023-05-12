@@ -51,10 +51,7 @@ def maybe(p=0.50):
     '''Uniformly random indicator function such that prob(I=1=True) = p.'''
     #  Nice to have for random "if" conditional branching.
     #  Fun note: Python's boolean True is actually mapped to int 1.
-    if randou() <= p:
-        return 1
-    else:
-        return 0
+    return 1 if randou() <= p else 0
 
 
 def randog(sigma=1.0):
@@ -70,10 +67,7 @@ def simug(sigma=SPXsigma/16., N=256):
        Argument sigma is the standard deviation, NOT the variance!
        Note the use of raw sigma, which is not necessarily annualized.
     '''
-    #  Default sigma is stylized per daily SPX data, see https://git.io/gmix
-    ratarr = sigma * np.random.randn(N)
-    #  For non-zero mean, simply add it later: mu + simug(sigma)
-    return ratarr
+    return sigma * np.random.randn(N)
 
 
 def simug_mix(sigma1=SPXsigma1/16., sigma2=SPXsigma2/16., q=SPXq, N=256):
@@ -102,10 +96,7 @@ def norat2ret(normarr, mean, sigma, yearly=256):
     '''
     meanly = mean / yearly   # e.g. 256 trading days in a year.
     sigmaly = sigma / (yearly ** 0.5)
-    retarr = (1 + meanly) + (sigmaly * normarr)
-    #  Thus e.g. an approximate 2% gain is converted to 1.02.
-    #  Recall that log differences approximate percentage changes.
-    return retarr
+    return (1 + meanly) + (sigmaly * normarr)
 
 
 def ret2prices(retarr, inprice=1.0):
@@ -116,10 +107,7 @@ def ret2prices(retarr, inprice=1.0):
     prices = np.cumprod(retarr)  # prices here is in np.array form.
     #      Initial price implicitly starts at 1 where
     #      the history of prices is just the products of the returns.
-    if inprice == 1.0:
-        return todf(prices)
-    else:
-        return todf(inprice * prices)
+    return todf(prices) if inprice == 1.0 else todf(inprice * prices)
 
 
 def zerat2prices(ratarr, mean=0, yearly=256, inprice=1.0):
@@ -140,12 +128,12 @@ def simushow(N=256, mean=0, yearly=256, repeat=1, func=simug_mix, visual=True,
         ratarr = func(N=N)
         prices = zerat2prices(ratarr, mean, yearly, inprice)
         if visual:
-            plotn(prices, title='tmp-'+func.__name__+'-'+istr)
+            plotn(prices, title=f'tmp-{func.__name__}-{istr}')
         try:
             gm2gem(prices, yearly=yearly, b=b)
         except OverflowError:
             system.warn("Excessive kurtosis: Skipping gm2gem() print.")
-        print('---------------------------------------' + istr)
+        print(f'---------------------------------------{istr}')
     return
 
 
@@ -159,13 +147,7 @@ def gmix2ret(N=256, mean=SPXmean, sigma=SPXsigma, yearly=256):
     sigmaly2 = SPXsigma2 / (yearly ** 0.5)
     gmarr = simug_mix(sigmaly1, sigmaly2, q=SPXq, N=N)
     normarr = gmarr * (1. / sigmaly)  # Stylized array of normalized rates.
-    #  normarr, though normalized, still retains leptokurtotic features.
-    #  Plain volatility is used to RESCALE variations using fitted GM(2).
-    retarr = norat2ret(normarr, mean, sigma, yearly)
-    #  TIP: concatenate this array with corresponding array from bootstrap
-    #       to create HYBRID synthetic/empirical returns.
-    #       See fecon236.boots.bootstrap.hybrid2ret()
-    return retarr
+    return norat2ret(normarr, mean, sigma, yearly)
 
 
 def gmix2prices(N=256, mean=SPXmean, sigma=SPXsigma, yearly=256, inprice=1.0):
@@ -183,12 +165,12 @@ def gmixshow(N=256, mean=SPXmean, sigma=SPXsigma, yearly=256, repeat=1,
         istr = str(i)
         prices = gmix2prices(N, mean, sigma, yearly, inprice)
         if visual:
-            plotn(prices, title='tmp-gmixshow-'+istr)
+            plotn(prices, title=f'tmp-gmixshow-{istr}')
         try:
             gm2gem(prices, yearly=yearly, b=b)
         except OverflowError:
             system.warn("Excessive kurtosis: Skipping gm2gem() print.")
-        print('---------------------------------------' + istr)
+        print(f'---------------------------------------{istr}')
     return
 
 

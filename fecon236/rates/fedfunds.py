@@ -27,8 +27,8 @@ def forefunds(nearby='16m', distant='17m'):
     ffer_ema = ema(ffer['1981':], 0.0645)
     #                    ^Eurodollar futures debut.
     #          ^Exponentially Weighted Moving Average, 30-period.
-    libor_nearby = get('f4libor' + nearby)
-    libor_distant = get('f4libor' + distant)
+    libor_nearby = get(f'f4libor{nearby}')
+    libor_distant = get(f'f4libor{distant}')
     libor_spread = todf(libor_nearby - libor_distant)
     #     spread in forward style quote since futures uses 100-rate.
     return todf(ffer_ema + libor_spread)

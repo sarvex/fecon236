@@ -91,15 +91,14 @@ def minBrute(fun, boundpairs, funarg=(), grids=20):
     #  boundpairs actually must be a tuple consisting of (min,max) tuples.
     if DISPLAY:
         print(" ::  Display for minBrute() ... ")
-    result = sop.brute(func=fun, args=funarg, ranges=boundpairs, Ns=grids,
-                       finish=None, full_output=DISPLAY)
-    #                  finish default is "fmin" (Nelder-Mead),
-    #                  which may not respect boundpairs !!!
-    #                  https://github.com/scipy/scipy/issues/1613
-    #  Estimated minimum is returned as ndarray if DISPLAY=0,
-    #  otherwise we see all grid evaluations inside a tuple
-    #  but the minimum in ndarray format is available as result[0].
-    return result
+    return sop.brute(
+        func=fun,
+        args=funarg,
+        ranges=boundpairs,
+        Ns=grids,
+        finish=None,
+        full_output=DISPLAY,
+    )
 
 
 def minNelder(fun, initial, funarg=()):
@@ -113,9 +112,7 @@ def minNelder(fun, initial, funarg=()):
     #      minimization", The Computer Journal, 7, pp. 308-313
     if DISPLAY:
         print(" ::  Display for minNelder() ... ")
-    result = sop.fmin(func=fun, args=funarg, x0=initial, disp=DISPLAY)
-    #  Estimated minimum is returned as ndarray:
-    return result
+    return sop.fmin(func=fun, args=funarg, x0=initial, disp=DISPLAY)
 
 
 def minBroyden(fun, initial, funarg=(), boundpairs=None):

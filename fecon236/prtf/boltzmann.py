@@ -170,8 +170,7 @@ def boltzweigh(dataframe, yearly=256, temp=55, floor=0.01, level=0):
     rates = gemratarr(dataframe, yearly)
     globalw = weighcovdata(dataframe)
     weights = rentrim(globalw, floor, level)
-    pweights = weighsoft(weights, rates, temp, floor, level)
-    return pweights
+    return weighsoft(weights, rates, temp, floor, level)
 
 
 def boltzportfolio(dataframe, yearly=256, temp=55, floor=0.01, level=0, n=4):

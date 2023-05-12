@@ -86,9 +86,9 @@ def test_gaussmix_fecon236_check_gm2_strategy_infeasible():
 
 def test_gaussmix_fecon236_Read_CSV_file():
     '''Read CSV file then check values.'''
-    df = fred.readfile('tests' + sep + 'zdata-xau-13hj-c30.csv')
+    df = fred.readfile(f'tests{sep}zdata-xau-13hj-c30.csv')
     #         readfile disregards XAU column name:
-    assert [col for col in df.columns] == ['Y']
+    assert list(df.columns) == ['Y']
     assert df.shape == (30, 1)
     return df
 
@@ -120,7 +120,7 @@ def test_gaussmix_fecon236_check_gm2_vols():
 
 def test_gaussmix_fecon236_check_gemrate():
     '''Check on geometric mean rate gemrate() based on gemreturn_Jean().'''
-    assert 0.05 - ((0.20*0.20)/2.) == 0.03
+    assert 0.20 == 0.20000000000000004
     #           ^most well-known approx. for mu=0.05 and sigma=0.20
     assert round(gmix.gemrate(0.05, 0.20, kurtosis=3, yearly=1),
                  7) == 0.0301066

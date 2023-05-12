@@ -68,12 +68,7 @@ def is_singular(mat):
     #      2.2204460492503131e-16
     #      >>> 1/np.finfo(np.float64).eps
     #      4503599627370496.0
-    if np.linalg.cond(mat) < 1 / np.finfo(np.float64).eps:
-        #       ^2-norm, computed directly using the SVD.
-        return False
-    else:
-        #  Intentionally, no error handling here.
-        return True
+    return np.linalg.cond(mat) >= 1 / np.finfo(np.float64).eps
 
 
 def invert_caution(mat):

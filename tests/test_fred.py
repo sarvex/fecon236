@@ -69,9 +69,9 @@ from fecon236.host import fred
 
 def test_fred_fecon236_Read_CSV_file():
     '''Read CSV file then check values.'''
-    df = fred.readfile('tests' + sep + 'zdata-xau-13hj-c30.csv')
+    df = fred.readfile(f'tests{sep}zdata-xau-13hj-c30.csv')
     #         readfile disregards XAU column name:
-    assert [col for col in df.columns] == ['Y']
+    assert list(df.columns) == ['Y']
     assert df.shape == (30, 1)
     return df
 
@@ -83,7 +83,7 @@ xau = tool.todf(xau, 'XAU')
 
 def test_fred_fecon236_check_xau_DataFrame():
     '''Check xau dataframe.'''
-    assert [col for col in xau.columns] == ['XAU']
+    assert list(xau.columns) == ['XAU']
     assert tool.tailvalue(xau) == 1393.75
 
 

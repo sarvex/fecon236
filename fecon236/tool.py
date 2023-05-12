@@ -119,11 +119,7 @@ def retrace(minimum, maximum, percent=50):
         system.die("DataFrame argument UNACCEPTABLE. Try retracedf()")
     span = maximum - minimum
     portion = span * (abs(percent)/100.0)
-    if percent < 0:
-        target = maximum - portion
-    else:
-        target = minimum + portion
-    return target
+    return maximum - portion if percent < 0 else minimum + portion
 
 
 def retracedf(dfx, percent=50):
@@ -156,11 +152,14 @@ def georet(dfx, yearly=256):
     lst = [geor, mean, vari ** 0.5]
     #                        ^^^^^^i.e. std sigma, or volatility.
     lst = [round(i*100, 2) for i in lst]
-    #       ^[geor, mean, volatility] in readable % form.
-    lst.append(yearly)
-    lst.append(dfx.shape[0])
-    lst.append(str(dfx.index[0]).replace(' 00:00:00', ''))
-    lst.append(str(dfx.index[-1]).replace(' 00:00:00', ''))
+    lst.extend(
+        (
+            yearly,
+            dfx.shape[0],
+            str(dfx.index[0]).replace(' 00:00:00', ''),
+            str(dfx.index[-1]).replace(' 00:00:00', ''),
+        )
+    )
     #   So lst: [geor, mean, volatility, yearly,
     #                   sample_size, start_date, end_date]
     return lst
@@ -185,10 +184,7 @@ def std(data, population=False):
     '''
     #  Ref: https://stackoverflow.com/questions/27600207
     #  ddof must be integer-valued (not boolean):
-    if population:
-        ddof = 0   # For POPULATION standard deviation: numpy default!
-    else:
-        ddof = 1   # For SAMPLE standard deviation: pandas default.
+    ddof = 0 if population else 1
     if isinstance(data, pd.DataFrame):
         #  This case will include ALL columns in the DataFrame.
         #  Convert to numpy array, then use numpy std() function:
@@ -295,7 +291,7 @@ def regresstime(dfy, col='Y'):
     #  Return just the fitted dataframe with original time intact.
     results = regressTIME(dfy, col)
     c, slope = results[1]
-    print(" ::  regresstime slope = " + str(slope))
+    print(f" ::  regresstime slope = {str(slope)}")
     return results[0]
 
 
@@ -305,7 +301,7 @@ def regresstimeforecast(dfy, h=24, col='Y'):
     forecast = [c + (slope * i) for i in range(h+1)]
     #  h=0 corresponds to the latest fitted point by design,
     #      so h=1 corresponds one-period ahead forecast.
-    print(" ::  regresstime slope = " + str(slope))
+    print(f" ::  regresstime slope = {str(slope)}")
     return todf(forecast, 'Forecast')
 
 
@@ -342,17 +338,11 @@ def regress(dfy, dfx, intercept=True):
     tmpdf = paste([todf(dfy), todf(dfx)])
     #  Need paste to properly align their index.
     tmpdf.columns = ['Y', 'X']
-    if intercept:
-        result = regressformula(tmpdf, 'Y ~ X')
-        #   Implicitly, formula includes constant intercept term...
-    else:
-        result = regressformula(tmpdf, 'Y ~ 0 + X')
-        #         ... whereas 0 excludes constant intercept term.
-    #  Formerly pandas ols returned printable result summary,  <= Gotcha
-    #  but now that is achieved by: print(result.summary())
-    #  Returning pure result gives us the flexibility to access
-    #  list of coefficients later as: result.params.tolist()
-    return result
+    return (
+        regressformula(tmpdf, 'Y ~ X')
+        if intercept
+        else regressformula(tmpdf, 'Y ~ 0 + X')
+    )
 
 
 def kurtfun(data, raw=False, population=False):
@@ -366,16 +356,7 @@ def kurtfun(data, raw=False, population=False):
     k_raw = (sum((arr - mu)**4)/len(arr))
     #     ^is sometimes called the "ABSOLUTE fourth central moment"
     #      which the Pearson version will then rescale.
-    if raw:
-        return k_raw
-    else:
-        k_Pearson = k_raw / sigma**4
-        #  Equivalent to: scipy.stats.kurtosis(arr, fisher=False, bias=False)
-        #                 when population=False, i.e. unbiased estimator,
-        #  and preferred by Wolfram: http://mathworld.wolfram.com/Kurtosis.html
-        #  which includes good references on estimation.
-        #  For normality test, see scipy.stats.kurtosistest()
-        return k_Pearson
+    return k_raw if raw else k_raw / sigma**4
 
 
 def stat2(dfy, dfx, intercept=True):
@@ -436,8 +417,7 @@ def df2a(dataframe):
     #  data_n_1 of type np.ndarrary will have shape (n,1)
     #  but that can be annoying, so data_n will have pure shape (n,) instead.
     data_n_1 = dataframe.dropna().values
-    data_n = data_n_1.reshape((len(data_n_1),))
-    return data_n
+    return data_n_1.reshape((len(data_n_1),))
 
 
 #  TIP:  After operating between dataframes, USE todf FOR CLARITY:
@@ -451,17 +431,8 @@ def todf(data, col='Y'):
     #  We need CONVERSION for possible "paste" later,
     #     without the hassle of type() testing beforehand.
     #
-    if isinstance(data, pd.DataFrame):
-        #  Oooops, easy to mistaken a dataframe for a series.
-        #  Move on, and just name that single column:
-        target = data
-        target.columns = [col]
-    else:
-        #  Do the conversion as intended:
-        #  target = pd.DataFrame(data, columns=[col])
-        #                               ^fails if col pre-exists in data.
-        target = pd.DataFrame(data)
-        target.columns = [col]
+    target = data if isinstance(data, pd.DataFrame) else pd.DataFrame(data)
+    target.columns = [col]
     #             ________ Explicitly drop NA values. Very helpful routinely!
     return target.dropna()
 
@@ -548,7 +519,7 @@ def diflog(data, lags=1):
     #        ^!!=> produces columns like Y_0, Y_1, Y_2, etc.
     #              So large lags will hog memory, but cf. pcent().
     #  Even if data is an array, output will always be a DataFrame:
-    return todf(lagged['Y_0'] - lagged['Y_'+str(lags)])
+    return todf(lagged['Y_0'] - lagged[f'Y_{str(lags)}'])
 
 
 def writefile(dataframe, filename='tmp-fe-tool.csv', separator=','):

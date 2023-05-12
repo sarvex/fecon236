@@ -38,7 +38,7 @@ world4d = {'America': 's4spy', 'Europe': 's4ezu',
 def groupget(ggdic=group4d, maxi=0):
     '''Retrieve and create group dataframe, given group dictionary.'''
     #  Since dictionaries are unordered, create SORTED list of keys:
-    keys = [key for key in sorted(ggdic)]
+    keys = list(sorted(ggdic))
     #  Download individual dataframes as values into a dictionary:
     dfdic = {key: get(ggdic[key], maxi) for key in keys}
     #           ^Illustrates dictionary comprehension.
